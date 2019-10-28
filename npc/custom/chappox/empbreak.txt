@@ -1,0 +1,192 @@
+//===== rAthena Script =======================================
+//= Novice Emperium Break
+//===== By: ==================================================
+//= Chappo
+//===== Current Version: =====================================
+//= 1.0
+//===== Compatible With: =====================================
+//= rAthena Project
+//===== Description: =========================================
+//= Novice Battle for Emperium
+//===== Additional Comments: =================================
+//= 1.0 Initial script.
+//============================================================
+
+-	script	Ferrymen	-1,{
+
+	mes "[ Ferrymen ]";
+	mes "What can I help you with?";
+	next;
+	menu "Warp to last save point",L_SavePoint,"Heal",L_Heal,"Canel",L_Cancel;
+	
+	L_SavePoint:
+	mes "[ Ferrymen ]";
+	mes "Come back. We still have a lot of work to do!";
+	SC_end SC_ALL;
+	warp "payo2", 88, 118;
+	close;
+	
+	L_Heal:
+	percentheal 100, 100;
+	skilleffect 34,0; sc_start SC_BLESSING,360000,10;
+	skilleffect 29,0; sc_start SC_INCREASEAGI,360000,10;
+	skilleffect 8,0; sc_start SC_ENDURE,360000,10;
+	skilleffect 33,0; sc_start SC_ANGELUS,360000,10;
+	skilleffect 45,0; sc_start SC_CONCENTRATE,360000,10;
+	skilleffect 114,0; sc_start SC_MAXIMIZEPOWER,360000,5;
+	skilleffect 357,0; sc_start SC_CONCENTRATION,360000,5;
+	skilleffect 380,0; sc_start SC_TRUESIGHT,360000,5;
+	mes "[ Ferrymen ]";
+	mes "What would you lot do without me?";
+	close;
+	
+	L_Cancel:
+	mes "[ Ferrymen ]";
+	mes "Have a good day.";
+	close;
+}
+
+
+-	script	Gallegos	-1,{
+
+	if ((Class == Job_Novice) && (.winner != 1) && (BaseLevel == 10))
+	{
+		mes "[ Ferryman Gallegos ]";
+		mes "How can I help you?";
+		next;
+		menu "Warp to battle zone",L_ToBattle,"Requirements",L_Requirements,"Lore",L_Lore;
+	} else if (.winner == 1)
+	{
+		if(.winnerName$ == strcharinfo(0))
+		{
+			mes "[ Ferryman Gallegos ]";
+			mes "Looks like you were able to do it!";
+			mes "I've never met anyone like you, ever!";
+			mes "Please take your prize";
+			next;
+			getitem 512, 1;
+			mes "[ Ferryman Gallegos ]";
+			mes "Good luck on the next round. You'll need it!";
+			.winner = 0;
+			disablenpc "Gallegos#pay1";
+			close;
+		} else
+		{
+			mes "[ Ferryman Gallegos ]";
+			mes .winnerName$+" has already claimed victory!";
+			mes "Try again next time!";
+			close;
+		}
+	} else
+	{
+		mes "[ Ferryman Gallegos ]";
+		mes "I am looking for novices to go to war for us.";
+		mes "If you are interrested, you should come back with  a novice.";
+		close;
+	}
+	
+	L_ToBattle:
+	mes "[ Ferryman Gallegos ]";
+	mes "Perfect. Warping you now";
+	skilleffect 34,0; sc_start SC_BLESSING,360000,10;
+	skilleffect 29,0; sc_start SC_INCREASEAGI,360000,10;
+	skilleffect 8,0; sc_start SC_ENDURE,360000,10;
+	skilleffect 33,0; sc_start SC_ANGELUS,360000,10;
+	skilleffect 45,0; sc_start SC_CONCENTRATE,360000,10;
+	skilleffect 114,0; sc_start SC_MAXIMIZEPOWER,360000,5;
+	skilleffect 357,0; sc_start SC_CONCENTRATION,360000,5;
+	skilleffect 380,0; sc_start SC_TRUESIGHT,360000,5;
+	switch(rand(6))
+	{
+		case 0: warp "pvp_y_1-4", 116, 57; end;
+		case 1: warp "pvp_y_1-4", 218, 86; end;
+		case 2: warp "pvp_y_1-4", 173, 133; end;
+		case 3: warp "pvp_y_1-4", 107, 223; end;
+		case 4: warp "pvp_y_1-4", 53, 208; end;
+		case 5: warp "pvp_y_1-4", 34, 50; end;
+	}
+	close;
+	
+	L_Requirements:
+	mes "[ Ferryman Gallegos ]";
+	mes "You need to be a Novice with a base level of 10.";
+	close;
+	
+	L_Lore:
+	mes "[ Ferryman Gallegos ]";
+	mes "Chappo will fill this in eventually";
+	close;
+	
+	L_Cancel:
+	mes "[ Ferryman Gallegos ]";
+	mes "Have a good day.";
+	close;
+	
+OnInit:
+	initnpctimer;
+	pvpoff "pvp_y_1-4";
+	setmapflag "pvp_y_1-4", noreturn;
+	setmapflag "pvp_y_1-4", noteleport;
+	setmapflag "pvp_y_1-4", nowarp;
+	setmapflag "pvp_y_1-4", nowarpto;
+	setmapflag "pvp_y_1-4", nosave;
+	setmapflag "pvp_y_1-4", nobranch;
+	setmapflag "pvp_y_1-4", nowarpto;
+	setmapflag "pvp_y_1-4", nowarpto;
+	announce "The emperium break is starting in 5 minutes. Talk to Ferryman Gallegos for more.",0;
+	end;
+	
+
+OnTimer300000:
+//OnTimer5000: // for testing
+	mapannounce "pvp_y_1-4", "We are now beginning emperium break!", 0;
+	sleep 5000;
+	mapannounce "pvp_y_1-4", "Attack the emperium. Whoever kills the Emperium wins!!", 0;
+	query_sql("REPLACE INTO `mob_db` VALUES (1288,'EMPELIUM','Emperium','Emperium',1,100,0,0,0,1,1,2,100,99,0,0,0,0,0,0,7,12,0,3,22,0x170000,2000,1,1,1,0,0,0,0,0,0,0,507,5500,712,1000,711,1000,905,500,906,300,914,500,708,50,2269,2,0,0,0,0);");
+	query_sql("REPLACE INTO `mob_db_re` VALUES (1288,'EMPELIUM','Emperium','Emperium',1,100,0,0,0,1,1,1,100,99,0,0,0,0,0,0,7,12,0,3,22,0x170000,2000,1,1,1,0,0,0,0,0,0,0,507,5500,712,1000,711,1000,905,500,7933,300,914,500,708,50,0,0,0,0,2269,2);"); // Changes Emp to plant
+	atcommand "@reloadmobdb";
+	monster "pvp_y_1-4",116,56,"Break Me",1288,1,"Gallegos::OnDeath";
+	pvpon "pvp_y_1-4";
+	disablenpc "Ferrymen#ilz1";
+	disablenpc "Ferrymen#ilz2";
+	disablenpc "Ferrymen#ilz3";
+	disablenpc "Ferrymen#ilz4";
+	disablenpc "Ferrymen#ilz5";
+	end;
+	
+OnDeath:
+	mapannounce "pvp_y_1-4", "We have a winner!", 0;
+	pvpoff "pvp_y_1-4";
+	.winner = 1;
+	.winnerID = killerrid;
+	.winnerName$ = rid2name(.winnerID);
+	sleep 5000;
+	mapannounce "pvp_y_1-4", .winnerName$+" won!! They will need to come claim their prize", 0;
+	sleep 5000;
+	mapannounce "pvp_y_1-4", "Please report to the Ferrymen to return home. Otherwise you will be warped forecefully", 0;
+	enablenpc "Ferrymen#ilz1";
+	enablenpc "Ferrymen#ilz2";
+	enablenpc "Ferrymen#ilz3";
+	enablenpc "Ferrymen#ilz4";
+	enablenpc "Ferrymen#ilz5";
+	//sleep 5000;
+	sleep 150000;
+	mapwarp "pvp_y_1-4","payo2", 89, 118;
+	query_sql("REPLACE INTO `mob_db` VALUES (1288,'EMPELIUM','Emperium','Emperium',90,68430,0,0,0,1,60,71,40,50,1,17,80,50,26,20,10,12,0,8,26,0x6200000,300,1288,288,384,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);");
+	query_sql("REPLACE INTO `mob_db_re` VALUES (1288,'EMPELIUM','Emperium','Emperium',90,700,1,0,0,1,66,13,64,50,1,17,80,50,26,20,10,12,0,8,26,0x6370000,300,1288,288,384,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);"); // Changes Emp to normal
+	atcommand "@reloadmobdb";
+	end;	
+}
+
+
+// Duplicates from area
+//============================================================
+pvp_y_1-4,192,168,6	duplicate(Ferrymen)	Ferrymen#ilz1	767
+pvp_y_1-4,114,60,6	duplicate(Ferrymen)	Ferrymen#ilz2	767
+pvp_y_1-4,113,232,6	duplicate(Ferrymen)	Ferrymen#ilz3	767
+pvp_y_1-4,23,240,6	duplicate(Ferrymen)	Ferrymen#ilz4	767
+pvp_y_1-4,58,38,6	duplicate(Ferrymen)	Ferrymen#ilz5	767
+
+// Duplicates to area
+//============================================================
+payo2,99,109,6	duplicate(Gallegos)	Gallegos#pay1	766

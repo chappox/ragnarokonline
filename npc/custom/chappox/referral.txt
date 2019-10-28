@@ -1,0 +1,68 @@
+//===== rAthena Script =======================================
+//= Referral Rewards 
+//===== By: ==================================================
+//= Chappo
+//===== Current Version: =====================================
+//= 1.0
+//===== Compatible With: =====================================
+//= rAthena Project
+//===== Description: =========================================
+//= If you have referral points, you can get stuff.
+//===== Additional Comments: =================================
+//= 1.0 Initial script. MUST USE SQL BELOW
+//============================================================
+//DROP TABLE IF EXISTS `referral`;
+//CREATE TABLE IF NOT EXISTS `referral` (
+//  `ref_id` int(11) NOT NULL AUTO_INCREMENT,
+//  `ref_account` int(11) NOT NULL,
+//  `target_accout` int(11) NOT NULL,
+//  `date_created` datetime NOT NULL,
+//  `date_redeemed` datetime DEFAULT NULL,
+//  `ref_number` varchar(255) NOT NULL UNIQUE,
+//  `redeemed_ip` varchar(15) NOT NULL,
+//  `npc_redeemed` int(1) unsigned NOT NULL DEFAULT '0',
+//  PRIMARY KEY (`ref_id`)
+//) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+//
+//ALTER TABLE `login`
+//	ADD COLUMN `ref_redeem_count` INT(3) UNSIGNED NULL DEFAULT '0' AFTER `blocked_unique_id`;
+
+
+-	script	Referral	-1,{
+
+	mes .@name$;
+	mes "Let me check if you have any rewards.."
+	@currentRewards = query_sql("SELECT login.ref_redeem_count FROM login WHERE account_id ="+getcharid(3));
+	next;
+	if (@currentRewards < 1) {
+		mes .@name$;
+		mes "You have no rewards to claim.";
+		close;
+	} else {
+		goto L_Reward;
+	}
+	
+	
+	L_Reward:
+	mes .@name$;
+	mes "Here is your reward. Thank you for supportin AspectRO";
+	switch(rand(5)) {
+		case 0: getitem .@reward[0]; end;
+		case 1: getitem .@reward[1]; end;
+		case 2: getitem .@reward[2]; end;
+		case 3: getitem .@reward[3]; end;
+		case 4: getitem .@reward[4]; end;
+	}
+	query_sql("UPDATE login SET (ref_redeem_count="+(@currentRewards-1)+") WHERE account_id ="+getcharid(3));
+	close;
+	
+	
+	OnInit:
+	setarray .@reward[0] = 512, 512, 512, 512, 512; // Rewarded Items (random of 5)
+	.@name$ = "[ Referral NPC ]";
+	end;
+}
+
+// Duplicates
+//============================================================
+payo2,87,111,6	duplicate(Socks)	ReferralNPC#pay1	760

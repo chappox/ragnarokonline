@@ -1,0 +1,145 @@
+//===== rAthena Script =======================================
+//= Socks (collection/rate increase script)
+//===== By: ==================================================
+//= Chappo
+//===== Current Version: =====================================
+//= 1.0
+//===== Compatible With: =====================================
+//= rAthena Project
+//===== Description: =========================================
+//= Collect enough of an item and increase rates for everyone
+//===== Additional Comments: =================================
+//= 1.0 Initial script.
+//============================================================
+
+-	script	Socks	-1,{
+
+	if (@skipstory == 1) goto L_Start;
+	mes "[ Madam Calcetine ]";
+	mes "Oh dear. What ever will I do?";
+	mes "Oh.. Hello, "+strcharinfo(0)+". Will you listen to an old woman's struggles?";
+	next;
+	if (select("Yes", "No") == 2) close;
+	next;
+	goto L_Story;
+	
+	L_Story:
+	mes "[ Madam Calcetine ]";
+	mes "Enter story here";
+	next;
+	goto L_Start;	
+	
+	L_Start:
+	if (@skipstory != 1) @skipstory = 1;
+	if ($totalSocksLeft == 0)
+	{
+		mes "[ Madam Calcetine ]";
+		mes "I hope that you're enjoying the extra experience!";
+		close;
+	}
+	mes "[ Madam Calcetine ]";
+	mes "So, to get started I will need ["+$totalSocksLeft+"] "+getitemname($@socksItems)+"s in total! After that, I will reward everyone with something good!";
+	next;
+	
+	L_Count:
+	mes "[ Madam Calcetine ]";
+	mes "Looks like you have "+countitem($@socksItems)+" in your inventory.";
+	if(countitem($@socksItems) == 0)
+	{
+		mes "Please start collecting "+getitemname($@socksItems)+"s as soon as possible!";
+		close;
+	}
+	mes "Would you like to donate them to the effort?";
+	next;
+	if (select("Yes", "No") == 2)
+	{
+		mes "[ Madam Calcetine ]";
+		mes "Ok. Come back and visit some other time.";
+		close;
+	} else 
+	{
+		if ($totalSocksLeft > 0)
+		{
+			if ($totalSocksLeft < countitem($@socksItems))
+			{
+				delitem $@socksItems, $totalSocksLeft;
+				$totalSocksLeft = 0;
+			} else 
+			{
+				delitem $@socksItems, countitem($@socksItems);
+				$totalSocksLeft = $totalSocksLeft - countitem($@socksItems);
+			}		
+		}
+		
+		mes "[ Madam Calcetine ]";
+		mes "Thank you for the donation! It will pay off in the end. I promise!";
+		next;
+		if ($totalSocksLeft < 1)
+		{
+			mes "[ Madam Calcetine ]";
+			mes "Wait.. I think..";
+			next;
+			mes "[ Madam Calcetine ]";
+			mes "We did it!";
+			mes "Thank you so much for helping me find my "+getitemname($@socksItems)+"s! As promised, I'll give you something nice!";
+			close2;
+			goto L_Reward;
+		} else 
+		{
+			mes "[ Madam Calcetine ]";
+			mes "We just need "+$totalSocksLeft+" more and everything will be better";
+			close;
+		}
+	}
+	
+	L_Reward:
+	// start double rates
+	setbattleflag "base_exp_rate", getbattleflag("base_exp_rate") * 2;
+	setbattleflag "job_exp_rate", getbattleflag("job_exp_rate") * 2;
+	setbattleflag "item_rate_heal", getbattleflag("item_rate_heal") * 2;
+	setbattleflag "item_rate_use", getbattleflag("item_rate_use") * 2;
+	setbattleflag "item_rate_equip", getbattleflag("item_rate_equip") * 2;
+	setbattleflag "item_rate_card", getbattleflag("item_rate_card") * 2;
+	setbattleflag "item_rate_mvp", getbattleflag("item_rate_mvp") * 2;
+	setbattleflag "item_rate_adddrop", getbattleflag("item_rate_adddrop") * 2;
+	setbattleflag "item_rate_treasure", getbattleflag("item_rate_treasure") * 2;
+	query_sql("UPDATE `aspect`.`mob_db` SET `Drop9id` = 0, `Drop9per` = 0 WHERE `Drop9id`= "+$@socksItems+" AND `Drop9per`= "+$@socksRate+";");
+	query_sql("UPDATE `aspect`.`mob_db_re` SET `Drop9id` = 0, `Drop9per` = 0 WHERE `Drop9id`= "+$@socksItems+" AND `Drop9per`= "+$@socksRate+";");
+	atcommand "@reloadmobdb";
+	$totalSocksLeft = 0;
+	announce "[Madam Calcetine]: Double rates enabled! Thanks for helping me find all of my "+getitemname($@socksItems)+"!",bc_all,0xFF6060;
+	initnpctimer;
+	end;
+	
+	OnTimer86400000: //24-hrs
+	//OnTimer5000: // testing 5-seconds
+	// remove double rates
+	setbattleflag "base_exp_rate", getbattleflag("base_exp_rate") / 2;
+	setbattleflag "job_exp_rate", getbattleflag("job_exp_rate") / 2;
+	setbattleflag "item_rate_heal", getbattleflag("item_rate_heal") / 2;
+	setbattleflag "item_rate_use", getbattleflag("item_rate_use") / 2;
+	setbattleflag "item_rate_equip", getbattleflag("item_rate_equip") / 2;
+	setbattleflag "item_rate_card", getbattleflag("item_rate_card") / 2;
+	setbattleflag "item_rate_mvp", getbattleflag("item_rate_mvp") / 2;
+	setbattleflag "item_rate_adddrop", getbattleflag("item_rate_adddrop") / 2;
+	setbattleflag "item_rate_treasure", getbattleflag("item_rate_treasure") / 2;
+	announce "[Madam Calcetine] : Thanks for helping me find all of my "+getitemname($@socksItems)+"! I hope you all enjoyed the rate incresae!",bc_all,0xFF6060;
+	$totalSocksLeft = $@socksAmount;
+	disablenpc "Madam Calcetine#pay1";
+	end;
+	
+	OnInit:
+	// need to add item to DB for collection
+	$@socksItems = 512; // Items needed to be collected
+	$@socksRate = 2500; // Percent (100 = 1%) (1 = 0.01%) 2500 is 25%
+	$@socksAmount = 500; // set to the amount they need to collect
+	$totalSocksLeft = $@socksAmount; // total amount needed tracker
+	query_sql("UPDATE `aspect`.`mob_db` SET `Drop9id` = "+$@socksItems+", `Drop9per` = "+$@socksRate+" WHERE `Drop9id`= 0 AND `Drop9per`= 0;");
+	query_sql("UPDATE `aspect`.`mob_db_re` SET `Drop9id` = "+$@socksItems+", `Drop9per` = "+$@socksRate+" WHERE `Drop9id`= 0 AND `Drop9per`= 0;");
+	atcommand "@reloadmobdb";
+	end;
+}
+
+// Duplicates
+//============================================================
+payo2,83,111,6	duplicate(Socks)	Madam Calcetine#pay1	760

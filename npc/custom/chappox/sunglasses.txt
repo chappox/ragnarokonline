@@ -1,0 +1,185 @@
+//===== rAthena Script =======================================
+//= Slotted Sunglassesses Trader
+//===== By: ==================================================
+//= Chappo (Idea by Prism~)
+//===== Current Version: =====================================
+//= 1.0
+//===== Compatible With: =====================================
+//= rAthena Project
+//===== Description: =========================================
+//= Collect enough of an item and get slotted sunglassess [1]
+//===== Additional Comments: =================================
+//= 1.0 Initial script.
+//============================================================
+
+-	script	SunglassesTrader	-1,{
+
+	if (@skipsunglassstory == 1) goto L_Start;
+	mes .@npcName1$;
+	mes "Hey? What are you doing all the way out here?";
+	next;;
+	mes .@npcName1$;
+	mes "You heard tha I have really fancy sunglasses huh?";
+	next;
+	mes .@npcName1$;
+	mes "Well, I don't give them away for free!";
+	next;
+	mes .@npcName1$;
+	mes "You'll have to get me";
+	mes "^FF00005x 1carat Diamond^000000";
+	mes "^FF0000200x Feather^000000";
+	mes "^FF0000100k Zeny^000000";
+	next;
+	mes .@npcName1$;
+	mes "Are you still interested?";
+	if (select("Yes", "No") == 2) close;
+	next;
+	mes .@npcName1$;
+	mes "Great, then get going!";
+	close;
+	
+	L_Start:
+	if (@skipsunglassstory != 1) @skipsunglassstory = 1;
+	mes .@npcName1$;
+	mes "Wow. You made it back pretty quick! Do you have my items?";
+	if (select("Yes", "No") == 2) close;
+	goto L_Count;
+	
+	L_Count:
+	for(set .@i,0; .@i<2; set .@i++) {
+		if (countitem($@sunglassessItems[.@i]) < $@sunglassessAmount[.@i]) {
+			mes .@npcName1$;
+			mes "You do not have all the required items! Stop being lazy and go get the items!";
+			close;
+		}
+	}
+	if (Zeny < .@zenyCost) {
+		mes .@npcName1$;
+		mes "You do not have enough Zeny! I need 100k in Zeny!";
+		close;
+	}
+	goto L_Reward;
+	close;
+	
+	L_Reward:
+	next;
+	mes .@npcName1$;
+	mes "You actually brought me everything!"
+	next;
+	mes .@npcName1$;
+	mes "I don't have the sunglasses with me.. You're going to have to meet my friend for them.";
+	next;
+	mes .@npcName1$;
+	mes "His name is Maseph, and hte last time I saw him he was somewhere east of Morroc.";
+	@sunglassesQuest = 1;
+	for(set .@i,0; .@i<2; set .@i++) {
+		delitem $@sunglassessItems[.@i], $@sunglassessAmount[.@i];
+	}
+	Zeny -=.@zenyCost;
+	close;
+	
+	OnInit:
+	setarray $@sunglassessItems[0] = 949, 730; // Items needed to be collected
+	setarray $@sunglassessAmount[0] = 200, 5; // set to the amount they need to collect.
+	.@zenyCost = 100000;
+	.@npcName1$ = "[ Sunglasses Trader ]";
+	end;
+}
+
+-	script	Maseph	-1,{
+
+	if (@sunglassesQuest != 1) goto L_Close;
+	if (@masephQuest !=1){
+		mes .@npcName1$;
+		mes "So, she sent you here to get some glasses, huh?";
+		next;;
+		mes .@npcName1$;
+		mes "You gave her what? I would've done it for a lot less.";
+		next;
+		mes .@npcName1$;
+		mes "Well, I don't give them away for free! So I still want my items..";
+		next;
+		mes .@npcName1$;
+		mes "You'll have to get me";
+		mes "^FF00001x Sunglasses^000000";
+		mes "^FF0000400k Zeny^000000";
+		next;
+		mes .@npcName1$;
+		mes "Are you still interested?";
+		if (select("Yes", "No") == 2) close;
+		next;
+		mes .@npcName1$;
+		mes "Great, then get going!";
+		@masephQuest = 1;
+		close;
+	}
+	goto L_Start;
+	
+	L_Start:
+	if (@skipsunglassstory != 1) @skipsunglassstory = 1;
+	mes .@npcName1$;
+	mes "Wow. You made it back pretty quick! Do you have my items?";
+	if (select("Yes", "No") == 2) close;
+	goto L_Count;
+	
+	L_Count:
+	for(set .@i,0; .@i<2; set .@i++) {
+		if (countitem($@sunglassessItems[.@i]) < $@sunglassessAmount[.@i]) {
+			mes .@npcName1$;
+			mes "You do not have all the required items! Stop being lazy and go get the items!";
+			close;
+		}
+	}
+	if (Zeny < .@zenyCost) {
+		mes .@npcName1$;
+		mes "You do not have enough Zeny! I need 400k in Zeny!";
+		close;
+	}
+	mes .@npcName1$;
+	mes "You actually brought me everything!"
+	next;
+	mes .@npcName1$;
+	mes "I don't have the sunglasses with me.. You're going to have to meet my friend for them.";
+	next;
+	mes .@npcName1$;
+	mes "His name is Maseph, and hte last time I saw him he was somewhere east of Morroc.";
+	@sunglassesQuest = 1;
+	close;
+	
+	L_Reward:
+	next;
+	mes .@npcName1$;
+	mes "You actually brought me everything!"
+	next;
+	mes .@npcName1$;
+	mes "Give me a minute..";
+	next;
+	mes .@npcName1$;
+	mes "Almost done...";
+	next;
+	mes .@npcName1$;
+	mes "And here you go, your new Sunglasses!";
+	@sunglassesQuest = 0;
+	for(set .@i,0; .@i<2; set .@i++) {
+		delitem $@sunglassessItems[.@i], $@sunglassessAmount[.@i];
+	}
+	Zeny -=.@zenyCost;
+	close;
+	
+	L_Close:
+	mes .@npcName1$;
+	mes "You shouldn't wonder out here without a pair a sunglasses. Trust me.";
+	close;
+	
+	OnInit:
+	$@sunglassessItems = 2201; // Items needed to be collected
+	$@sunglassessAmount = 1; // set to the amount they need to collect.
+	.@zenyCost = 4000000;
+	.@npcName1$ = "[ Maseph ]";
+	end;
+}
+
+// Duplicates
+//============================================================
+alberta,88,193,6	duplicate(Socks)	Sunglasses Trader#1	760
+moc_fild09,209,128,6	duplicate(Socks)	Maseph﻿#1	760
